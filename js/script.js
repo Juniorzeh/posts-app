@@ -11,6 +11,13 @@ document.addEventListener("DOMContentLoaded", init);
 
 function init() {
   loadPosts();
+  searchEl.addEventListener("input", () => {
+    applyFilters();
+  });
+
+  userFilterEl.addEventListener("change", () => {
+    applyFilters();
+  });
 }
 
 async function loadPosts() {
@@ -28,7 +35,7 @@ async function loadPosts() {
     allPosts = data;
 
     statusEl.textContent = "";
-    renderPosts(allPosts);
+    applyFilters();
   } catch (err) {
     statusEl.textContent = "";
     errorEl.textContent = "Erro ao carregar posts.";
@@ -40,24 +47,31 @@ async function loadPosts() {
 function renderPosts(posts) {
   list.innerHTML = "";
 
+  if (posts.length === 0) {
+    const p = document.createElement("div");
+    p.textContent = "Nenhum post encontrado";
+    list.appendChild(p);
+    return;
+  }
+
   posts.forEach((post) => {
-    const div = document.createElement("div");
-    div.classList.add("item");
+      const div = document.createElement("div");
+      div.classList.add("item");
 
-    let resumo = post.body;
-    if (post.body.length > 100) resumo = post.body.substring(0, 100) + "...";
+      let resumo = post.body;
+      if (post.body.length > 100) resumo = post.body.substring(0, 100) + "...";
 
-    div.innerHTML = `
-      <strong>${post.title}</strong>
-      <p class="muted">${resumo}</p>
-    `;
+      div.innerHTML = `
+        <strong>${post.title}</strong>
+        <p class="muted">${resumo}</p>
+      `;
 
-    div.addEventListener("click", () => {
+      div.addEventListener("click", () => {
       showDetail(post);
-    });
+      });
 
-    list.appendChild(div);
-  });
+      list.appendChild(div);
+    });
 }
 
 function showDetail(post) {
@@ -65,4 +79,33 @@ function showDetail(post) {
   document.getElementById("dBody").textContent = post.body;
   document.getElementById("dMeta").textContent = `userId: ${post.userId} • postId: ${post.id}`;
   detailEl.classList.remove("hidden");
+}
+
+function filterByTitle(posts, term) {
+  const t = term.trim().toLowerCase();
+  if (t === "") {
+    return posts;
+  }
+
+  return posts.filter(post => post.title.toLowerCase().includes(t));
+}
+
+function filterByUser(posts, userValue) {
+  if (userValue === "all") {
+    return posts;
+  } else {
+    return posts.filter(post => post.userId === Number(userValue));
+  }
+}
+
+function applyFilters() {
+  const userValue = userFilterEl.value;
+  const searchTerm = searchEl.value;
+
+  let result = allPosts;
+
+  result = filterByUser(result,userValue);
+  result = filterByTitle(result, searchTerm)
+
+  renderPosts(result);
 }
