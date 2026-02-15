@@ -33,6 +33,8 @@ async function loadPosts() {
 
     const data = await response.json();
     allPosts = data;
+    populateUserFilter(allPosts);
+    applyFilters();
 
     statusEl.textContent = "";
     applyFilters();
@@ -108,4 +110,23 @@ function applyFilters() {
   result = filterByTitle(result, searchTerm)
 
   renderPosts(result);
+}
+
+function populateUserFilter(posts) {
+  const ids = posts.map(post => post.userId);
+  const uniqueIds  = new Set(ids);
+  const cleanIds  = Array.from(uniqueIds);
+  cleanIds.sort((a,b) => a - b);
+
+  while (userFilterEl.options.length > 1) {
+    userFilterEl.remove(1);
+  }
+
+  cleanIds.forEach((idClean) => {
+    const option = document.createElement("option");
+    option.value = idClean;
+    option.textContent = `Usuário ${idClean}`;
+    userFilterEl.appendChild(option);
+  });
+
 }
