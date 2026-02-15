@@ -8,10 +8,5 @@ Mini app consumindo API pública para listar posts.
 - Renderização de lista com resumo (100 caracteres)
 - Clique para ver detalhes do post
 
-## Próximos passos
-- Busca por título
-- Filtro por userId
-- Estado "Nenhum post encontrado"
-
 ## API
 https://jsonplaceholder.typicode.com/posts
